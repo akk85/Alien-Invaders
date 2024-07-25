@@ -7,8 +7,8 @@ more classes, 99% of the time they belong in either the wave module or the
 models module. If you are unsure about where a new class should go, post a
 question on Piazza.
 
-# YOUR NAME(S) AND NETID(S) HERE
-# DATE COMPLETED HERE
+# Antony Kariuki, akk85
+# 12/03/2021
 """
 from consts import *
 from game2d import *
