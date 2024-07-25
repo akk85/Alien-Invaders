@@ -11,7 +11,7 @@ Date Completed: 12/03/2021
 """
 from consts import *
 from game2d import *
-from wave1 import *
+from wave import *
 
 
 # PRIMARY RULE: Invaders can only access attributes in wave.py via getters/setters
