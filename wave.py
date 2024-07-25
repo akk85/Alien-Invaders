@@ -1,320 +1,378 @@
 """
 Subcontroller module for Alien Invaders
 
-This module contains the subcontroller to manage a single level or wave in
-the Alien Invaders game.  Instances of Wave represent a single wave. Whenever
-you move to a new level, you are expected to make a new instance of the class.
+This module contains the subcontroller to manage a single level or wave in the Alien
+Invaders game.  Instances of Wave represent a single wave.  Whenever you move to a
+new level, you are expected to make a new instance of the class.
 
-The subcontroller Wave manages the ship, the aliens and any laser bolts on
-screen. These are model objects.  Their classes are defined in models.py.
+The subcontroller Wave manages the ship, the aliens and any laser bolts on screen.
+These are model objects.  Their classes are defined in models.py.
 
-Most of your work on this assignment will be in either this module or
-models.py. Whether a helper method belongs in this module or models.py is
-often a complicated issue.  If you do not know, ask on Piazza and we will
-answer.
+Most of your work on this assignment will be in either this module or models.py.
+Whether a helper method belongs in this module or models.py is often a complicated
+issue.  If you do not know, ask on Piazza and we will answer.
 
-# Antony Kariuki, akk85
-# 12/03/2021
+Author: Antony Kariuki, akk85
+Date Completed: 12/03/2021
 """
+
 from game2d import *
 from consts import *
 from models import *
 import random
 
 # PRIMARY RULE: Wave can only access attributes in models.py via getters/setters
-# Wave is NOT allowed to access anything in app.py (Subcontrollers are not
-# permitted to access anything in their parent. To see why, take CS 3152)
+# Wave is NOT allowed to access anything in app.py (Subcontrollers are not permitted
+# to access anything in their parent. To see why, take CS 3152)
 
 
 class Wave(object):
     """
     This class controls a single level or wave of Alien Invaders.
 
-    This subcontroller has a reference to the ship, aliens, and any laser bolts
-    on screen. It animates the laser bolts, removing any aliens as necessary.
-    It also marches the aliens back and forth across the screen until they are
-    all destroyed or they reach the defense line (at which point the player
-    loses). When the wave is complete, you  should create a NEW instance of
-    Wave (in Invaders) if you want to make a new wave of aliens.
+    This subcontroller has a reference to the ship, aliens, and any laser bolts on screen.
+    It animates the laser bolts, removing any aliens as necessary. It also marches the
+    aliens back and forth across the screen until they are all destroyed or they reach
+    the defense line (at which point the player loses). When the wave is complete, you
+    should create a NEW instance of Wave (in Invaders) if you want to make a new wave of
+    aliens.
 
-    If you want to pause the game, tell this controller to draw, but do not
-    update.  See subcontrollers.py from Lecture 24 for an example.  This
-    class will be similar to than one in how it interacts with the main class
-    Invaders.
+    If you want to pause the game, tell this controller to draw, but do not update.  See
+    subcontrollers.py from Lecture 24 for an example.  This class will be similar to
+    than one in how it interacts with the main class Invaders.
 
-    All of the attributes of this class ar to be hidden. You may find that
-    you want to access an attribute in class Invaders. It is okay if you do,
-    but you MAY NOT ACCESS THE ATTRIBUTES DIRECTLY. You must use a getter
-    and/or setter for any attribute that you need to access in Invaders.
-    Only add the getters and setters that you need for Invaders. You can keep
-    everything else hidden.
+    #UPDATE ME LATER
+    INSTANCE ATTRIBUTES:
+        _ship:   the player ship to control [Ship]
+        _aliens: the 2d list of aliens in the wave [rectangular 2d list of Alien or None]
+        _bolts:  the laser bolts currently on screen [list of Bolt, possibly empty]
+        _dline:  the defensive line being protected [GPath]
+        _lives:  the number of lives left  [int >= 0]
+        _time:   The amount of time since the last Alien "step" [number >= 0]
 
+    As you can see, all of these attributes are hidden.  You may find that you want to
+    access an attribute in class Invaders. It is okay if you do, but you MAY NOT ACCESS
+    THE ATTRIBUTES DIRECTLY. You must use a getter and/or setter for any attribute that
+    you need to access in Invaders.  Only add the getters and setters that you need for
+    Invaders. You can keep everything else hidden.
+
+    You may change any of the attributes above as you see fit. For example, may want to
+    keep track of the score.  You also might want some label objects to display the score
+    and number of lives. If you make changes, please list the changes with the invariants.
+
+    LIST MORE ATTRIBUTES (AND THEIR INVARIANTS) HERE IF NECESSARY
+        _direction: the current direction of the wave [str; 'left','right', or 'down']
+        _stepsToFire: the number of steps should take before any alien shoot a bolt [int]
+        _aliensLeft: the number of aliens left [int]
+        _waveSpeed: the number of seconds between alien steps [0 < float <= 1]
+        _score: the current score of the player [int]
+        _sound: states whether the sound is on or off [bool]
+        _popSound: sound when an alien is killed [Sound object]
+        _blastSound: sound when the ship is destroyed [Sound object]
+        _pewShipSound: sound when the ship fires a bolt [Sound object]
+        _pewAlienSound: sound when an alien fires a bolt [Sound object]
     """
-    # HIDDEN ATTRIBUTES:
-    # Attribute _ship: the player ship to control
-    # Invariant: _ship is a Ship object or None
-    #
-    # Attribute _aliens: the 2d list of aliens in the wave
-    # Invariant: _aliens is a rectangular 2d list containing Alien objects or None
-    #
-    # Attribute _bolts: the laser bolts currently on screen
-    # Invariant: _bolts is a list of Bolt objects, possibly empty
-    #
-    # Attribute _dline: the defensive line being protected
-    # Invariant : _dline is a GPath object
-    #
-    # Attribute _lives: the number of lives left
-    # Invariant: _lives is an int >= 0
-    #
-    # Attribute _time: the amount of time since the last Alien "step"
-    # Invariant: _time is a float >= 0s
-    #
-    # You may change any attribute above, as long as you update the invariant
-    # You may also add any new attributes as long as you document them.
-    # LIST MORE ATTRIBUTES (AND THEIR INVARIANTS) HERE IF NECESSARY
-
 
     # GETTERS AND SETTERS (ONLY ADD IF YOU NEED THEM)
+    def getLives(self):
+        """
+        Returns the number of the player's lives left.
+        """
+        return self._lives
 
+    def getShip(self):
+        """
+        Returns the ship.
+        """
+        return self._ship
+
+    def getAliensLeft(self):
+        """
+        Returns the number of aliens left.
+        """
+        return self._aliensLeft
+
+    def getScore(self):
+        """
+        Returns the player's score.
+        """
+        return self._score
+
+    def getSound(self):
+        """
+        Return whether the sound is on or off.
+        """
+        return self._sound
+
+    def setShip(self):
+        """
+        Creates a new Ship object.
+        """
+        self._ship = Ship()
+
+    def setSound(self, value):
+        """
+        Sets the sound to True/False.
+
+        Parameter value: whether the sound is on or off
+        Preconditions: value is a bool
+        """
+        self._sound = value
 
     # INITIALIZER (standard form) TO CREATE SHIP AND ALIENS
     def __init__(self):
         """
-        Initializer for wave objects
+        Initializes a new Wave object.
         """
-
+        self._blockAliens()
         self._ship = Ship()
-        self._aliens = None
+        self._dline = GPath(points=[0, DEFENSE_LINE, GAME_WIDTH, DEFENSE_LINE],
+        linewidth = 0.5, linecolor = 'gray')
         self._bolts = []
-        self._lives = 3
         self._time = 0
-        self._right = True
-        self._createAliens()
+        self._direction = 'right'
+        self._stepsToFire = random.randint(1,BOLT_RATE)
+        self._lives = SHIP_LIVES
+        self._aliensLeft = ALIEN_ROWS * ALIENS_IN_ROW
+        self._score = 0
+        self._popSound = Sound(POP_SOUND)
+        self._blastSound = Sound(BLAST_SOUND)
+        self._pewShipSound = Sound(SHIP_PEW)
+        self._pewAlienSound = Sound(ALIEN_PEW)
+        self._sound = True
+        self._waveSpeed = ALIEN_SPEED
 
+    #NON-HIDDEN METHODS
 
     # UPDATE METHOD TO MOVE THE SHIP, ALIENS, AND LASER BOLTS
-    def update(self,input,dt):
+    def update(self, user_input, dt):
         """
-        Animates the ship, aliens and laser bolts
-        Parameter dt: The time since the last animation frame
-        Precondition: dt is a float
-        Parameter input: The users Input
-        Precondition:
+        Animates the ship, aliens, and the laser bolts.
+
+        Parameter user_input: states whether the user pressed a certain key
+        Precondition: user_input is a list of bools
+
+        Parameter dt: The time in seconds since last update
+        Precondition: dt is a number (int or float)
         """
+        self._shipController(user_input)
+        self._alienController(dt)
+        self._boltsController()
 
-        self._updateShip(input)
-        self._updateAliens(dt)
-        self._ShipBolt(input)
-        self._MoveBoltsUp()
-
-
-    #DRAW METHOD TO DRAW THE SHIP, ALIENS, DEFENSIVE LINE AND BOLTS
+    # DRAW METHOD TO DRAW THE SHIP, ALIENS, DEFENSIVE LINE AND BOLTS
     def draw(self, view):
         """
-        Calls the functions that draw the aliens, ship,_dline, bolts and other features eg texts
-        """
+        This method draws all the models: aliens, ship, defensive line,
+        and bolts.
 
-        self._drawShip(view)
-        self._drawAliens(view)
-        self._ship.draw(view)
-        self._drawDline(view)
-        self._drawBolts(view)
-        self._updateBolts(view)
-
-
-    #Helper function to help create the aliens
-    def _createAliens(self):
+        Parameter view: the game view, used in drawing
+        Precondition: view is instance of GView; it is inherited from GameApp
         """
-        Creates a list of aliens in their respective positions
-        """
-        self._aliens=[]
-        centre_of_aliens = ALIEN_WIDTH*0.5
-        pos_left = ALIEN_H_SEP + centre_of_aliens
-        pos_top = GAME_HEIGHT-ALIEN_CEILING
-        for column in range(ALIENS_IN_ROW):
-            list = [] #List of aliens to append to aliens after creation.
-            x = (ALIEN_WIDTH+ALIEN_H_SEP)*column
-            for row in range(ALIEN_ROWS):
-                y = (ALIEN_HEIGHT+ALIEN_V_SEP)*row
-                index = (ALIEN_ROWS -1 - row)//2%len(ALIEN_IMAGES)
-                source = ALIEN_IMAGES[index]
-                list.append(Alien(pos_left+ x,pos_top -y , source))
-
-            self._aliens.append(list)
-        return self._aliens
-
-    #function to DRAW THE ALIEN
-    def _drawAliens(self, view):
-        """
-        Draws the Aliens
-        """
-        for column in range(len(self._aliens[0])):
-            for row in range(len(self._aliens)):
-               alien=self._aliens[row][column]
-               if (alien is not None):
+        #DRAW A BLOCK OF ALIENS
+        for row in range(ALIEN_ROWS):
+            for col in range(ALIENS_IN_ROW):
+                alien = self._aliens[row][col]
+                if alien!=None:
                     alien.draw(view)
-
-
-    def _moveAliens(self):
-        """
-        Moves the aliens right first, and then left once they hit the wall, and so forth...
-        Parameter dt: The time since the last animation frame.
-        Precondition: dt is a float.
-        """
-        self._moveAliensRight()
-
-
-
-    def _updateAliens(self,dt):
-        """
-        Updates the Aliens by calling the function _moveAliens
-        """
-        if self._time < ALIEN_SPEED:
-            self._time = self._time + dt
-            return
-        else:
-            self._time = 0
-            self._moveAliens()
-
-
-    def _moveAliensRight(self):
-
-        """
-        Moves the aliens right and (down once they hit the wall by calling the function _moveAliensDown )
-        """
-        reached = False
-        for row in self._aliens:
-            for alien in row:
-                if alien is not None:
-                    if self._right ==  True:
-                        alien.x = alien.x + ALIEN_H_WALK
-                    else:
-                        alien.x = alien.x - ALIEN_H_WALK
-                    if alien.left < ALIEN_H_SEP or alien.right + ALIEN_H_SEP > GAME_WIDTH:
-                        reached = True
-        if reached == True:
-            self._right = not self._right
-            self._moveAliensDown()
-
-    def _moveAliensDown(self):
-        """
-        Moves the aliens down after reaching edge of the screen
-        """
-        for row in self._aliens:
-            for alien in row:
-                if alien is not None:
-                    alien.y = alien.y - ALIEN_V_WALK
-
-
-    def _drawShip(self,view):
-        """
-        Draws the Ship
-        """
-        self._ship.draw(view)
-
-    def _updateShip(self,input):
-        """
-        Method to update ship
-        """
-        if input.is_key_down('left') and self._ship.left > 0:
-            self._ship.moveshipleft()
-        if input.is_key_down('right') and self._ship.right < GAME_WIDTH:
-            self._ship.moveshipright()
-
-
-
-    def _drawDline(self,view):
-        """
-        Draws the defensive line
-        """
-        self._dline = GPath(points=[0,DEFENSE_LINE,GAME_WIDTH,DEFENSE_LINE],linewidth=2, linecolor = 'black')
+        #DRAW THE DEFENSIVE LINE
         self._dline.draw(view)
-
-
-
-    def _drawBolts(self,view):
-        """
-        Draws the Bolts
-        """
-        for bolt in range(len(self._bolts)):
-            self._bolts[bolt].draw(view)
-
-
-
-    def _ShipBolt(self, input):
-        """
-        Creates a list and appends player bolts to that list
-        Parameter input: the user input, used to control the ship and change state
-        [instance of GInput; it is inherited from GameApp]
-        Precondition: Must be an instance of GInput
-        """
-        bolts_list=[]
+        #DRAW THE SHIP
+        if self._ship != None:
+            self._ship.draw(view)
+        #DRAW THE BOLTS
         for bolt in self._bolts:
-            if bolt.isPlayerBolt() == True:
-                bolts_list.append(1)
-        if len(bolts_list)==0:
-            if input.is_key_down('up'):
-                self._bolts.append(Bolt(self._ship.x, SHIP_HEIGHT + BOLT_HEIGHT*2, BOLT_UP, BOLT_SPEED, 'red'))
-                pewSound = Sound('pew2.wav')
-                pewSound.play()
+            bolt.draw(view)
 
-    def _MoveBoltsUp(self):
+    def aliensPassedDefLine(self):
         """
-        Moves the players bolts up one at a time.
+        Returns True if any alien which is not destroyed has passed
+        the defensive line; Otherwise, returns False.
+        """
+        for row in self._aliens:
+            for alien in row:
+                if alien!=None and (alien.getY()-ALIEN_HEIGHT/2)<= DEFENSE_LINE:
+                    return True
+        return False
+
+    #HIDDEN METHODS
+
+    #HELPER METHODS FOR INITIALIZER
+    def _blockAliens(self):
+        """
+        Creates a block (a 2D list) of Alien objects.
+        """
+        # STARTING X COORDINATE OF THE BLOCK
+        block_left = ALIEN_H_SEP + ALIEN_WIDTH/2
+        # HEIGHT OF THE BLOCK OF ALIENS
+        block_height = ALIEN_ROWS * ALIEN_HEIGHT + (ALIEN_ROWS-1)*ALIEN_H_SEP
+        # STARTING Y COORDINATE OF THE BLOCK
+        block_bottom = GAME_HEIGHT - block_height - ALIEN_CEILING
+
+        self._aliens=[]
+        for row in range(ALIEN_ROWS):
+            list_row = []
+            factor = row % 6
+            if factor==0 or factor ==1:
+                picture = ALIEN_IMAGES[0]
+            elif factor==2 or factor ==3:
+                picture = ALIEN_IMAGES[1]
+            else:
+                picture = ALIEN_IMAGES[2]
+            for col in range(ALIENS_IN_ROW):
+                list_row.append(Alien(block_left+(ALIEN_WIDTH+ALIEN_H_SEP)*col,
+                block_bottom + (ALIEN_HEIGHT+ALIEN_V_SEP)*row,picture))
+            self._aliens.append(list_row)
+
+    #HELPER METHODS FOR UPDATE
+    def _alienController(self,dt):
+        """
+        Moves the block of aliens and generates laser bolts from the aliens.
+
+        Parameter dt: The time in seconds since last update
+        Precondition: dt is a number (int or float)
+        """
+        self._time += dt
+        if self._time >= self._waveSpeed:
+            rightest = self._findRightestAlien()
+            leftest = self._findLeftestAlien()
+
+            if self._direction == 'right':
+                if rightest.getX() + ALIEN_H_WALK <= (GAME_WIDTH -
+                (ALIEN_WIDTH/2 + ALIEN_H_SEP)):
+                    self._alienMove('right')
+                else:
+                    self._direction = 'left'
+                    self._alienMove('down')
+            elif self._direction == 'left':
+                if leftest.getX() - ALIEN_H_WALK >= ALIEN_WIDTH/2 + ALIEN_H_SEP:
+                    self._alienMove('left')
+                else:
+                    self._direction = 'right'
+                    self._alienMove('down')
+            self._stepsToFire -= 1
+            if self._stepsToFire == 0:
+                alienToShoot = random.choice(self._findBottomAliens())
+                if self._sound:
+                    self._pewAlienSound.play()
+                self._bolts.append(Bolt(alienToShoot.getX(),
+                alienToShoot.getY()-ALIEN_HEIGHT/2-BOLT_HEIGHT/2, -BOLT_SPEED))
+                self._stepsToFire = random.randint(1,BOLT_RATE)
+            self._time = 0
+
+    def _shipController(self, user_input):
+        """
+        Moves the ship to the left and to the right and generates ship laser
+         bolts, according to the user's input.
+
+        Parameter user_input: states whether the user pressed a certain key
+        Precondition: user_input is a list of bools
+        """
+        if user_input[0] == True:
+            self._ship.setX(self._ship.getX() + min(SHIP_MOVEMENT,
+            GAME_WIDTH - SHIP_WIDTH/2 - self._ship.getX()))
+        if user_input[1] == True:
+            self._ship.setX(self._ship.getX() - min(SHIP_MOVEMENT,
+            self._ship.getX() - SHIP_WIDTH/2))
+        if user_input[2]==True and self._existsPlayerBolt() == False:
+            if self._sound:
+                self._pewShipSound.play()
+            self._bolts.append(Bolt(self._ship.getX(),
+            SHIP_BOTTOM + SHIP_HEIGHT + BOLT_HEIGHT/2, BOLT_SPEED))
+
+    def _boltsController(self):
+        """
+        This method animates the bolts and determines if any of them collides
+        with an alien or with the ship. If it does, the method removes the
+        corresponding bolt from the list of bolts, assignes None to the
+        destroyed alien/ship, and if an alien is destroyed, the method increases
+        the player's score and speeds up the rest of the aliens.
         """
         for bolt in self._bolts:
-            centre_of_bolt = BOLT_HEIGHT*0.5
-            if bolt.isPlayerBolt() == True:
-                bolt.y = bolt.y + bolt.getVelocity()
-                if bolt.y > GAME_HEIGHT + centre_of_bolt:
-                    self._bolts.remove(bolt)
+            bolt.setY(bolt.getY() + bolt.getVel())
+            for row in range(ALIEN_ROWS):
+                for col in range(ALIENS_IN_ROW):
+                    if (self._aliens[row][col]!=None and bolt.isPlayerBolt() and
+                    self._aliens[row][col].collides(bolt)):
+                        if self._sound:
+                            self._popSound.play()
+                        self._aliens[row][col] = None
+                        self._score += (row+1)*10
+                        self._bolts.remove(bolt)
+                        self._aliensLeft -= 1
+                        #SPEED UP THE ALIENS
+                        self._waveSpeed *= ALIEN_ACCELERATION
+            if (self._ship != None and self._ship.collides(bolt)
+            and not bolt.isPlayerBolt()):
+                if self._sound:
+                    self._blastSound.play()
+                self._ship = None
+                self._bolts.remove(bolt)
+                self._lives -= 1
+            if (bolt.getY() - BOLT_HEIGHT/2 >= GAME_HEIGHT or
+            bolt.getY() + BOLT_HEIGHT/2 <= 0):
+                self._bolts.remove(bolt)
 
-
-    def _updateBolts(self,view):
+    #HELPER METHODS FOR _alienController()
+    def _findRightestAlien(self):
         """
-        Updates the position of the bolts during combat
+        Returns the rightmost alien which is not None.
+        """
+        rightest = None
+        for col in range(ALIENS_IN_ROW):
+            for row in range(ALIEN_ROWS):
+                if self._aliens[row][col] != None:
+                    rightest = self._aliens[row][col]
+        return rightest
+
+    def _findLeftestAlien(self):
+        """
+        Returns the leftmost alien which is not None.
+        """
+        leftest = None
+        for col in range(ALIENS_IN_ROW-1, -1, -1):
+            for row in range(ALIEN_ROWS):
+                if self._aliens[row][col] != None:
+                    leftest = self._aliens[row][col]
+        return leftest
+
+    def _alienMove(self, direction):
+        """
+        Moves the block of aliens with one step.
+
+        Parameter direction: the current direction of the wave
+        Precondition: direction is a string ('right', 'left', or 'down')
+        """
+        for row in self._aliens:
+            for alien in row:
+                if alien!=None:
+                    if direction=='right':
+                        alien.setX(alien.getX() + ALIEN_H_WALK)
+                    elif direction == 'left':
+                        alien.setX(alien.getX() - ALIEN_H_WALK)
+                    else:
+                        alien.setY(alien.getY() - ALIEN_V_WALK)
+
+    def _findBottomAliens(self):
+        """
+        Returns a list which includes the bottom alien from each column.
+        """
+        list = []
+        for col in range(ALIENS_IN_ROW):
+            bottom = None
+            for row in range(ALIEN_ROWS-1,-1,-1):
+                if self._aliens[row][col]!=None:
+                    bottom = self._aliens[row][col]
+            if bottom!=None:
+                list.append(bottom)
+        return list
+
+    #HELPER METHOD FOR _boltsController()
+    def _existsPlayerBolt(self):
+        """
+        Returns True if there is a player's bolt on the screen; Otherwise,
+        returns False.
         """
         for bolt in self._bolts:
-            bolt.y = bolt.y + BOLT_SPEED
-
-
-
-    def _AliensBolts():
-        """
-        Creates and appends alien Bolts to thhe list of bolts
-        """
-
-
-
-    def _pressbolt(self, input):
-        """
-        Determines if there was a key press
-
-        This method checks for a key press, and if there is
-        one, creates a player bolt . A key
-        press is when a key is pressed for the FIRST TIME.
-        We do not want the state to continue to change as
-        we hold down the key. The user must release the
-        key and press it again to change the state.
-
-        ##Credits and acknowledgement: I used code inspired by Walker White's state.py sample code.
-        """
-
-        # Determine the current number of keys pressed
-        curr_keys = self.input.is_key_down('up')
-
-
-        # Only change if we have just pressed the keys this animation frame
-        change = curr_keys and self.lastkeys == 0
-
-        if self._state == STATE_INACTIVE:
-            if change:
-            # Click happened.  Change the state
-                self._state = STATE_NEWWAVE
-
-
-        # Update last_keys
-        self.lastkeys= self.input.key_count
-
-
-    # HELPER METHODS FOR COLLISION DETECTION
+            if bolt.isPlayerBolt():
+                return True
+        return False
