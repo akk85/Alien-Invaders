@@ -5,8 +5,8 @@ This module global constants for the game Alien Invaders. These constants need t
 in the model, the view, and the controller. As these are spread across multiple modules,
 we separate the constants into their own module. This allows all modules to access them.
 
-# Antony Kariuki, akk85
-# 12/03/2021
+Author: Antony Kariuki, akk85
+Date Completed: 12/03/2021
 """
 import introcs
 import sys
@@ -129,6 +129,9 @@ except:
 # The alternate images to use in the filmstrip
 SHIP_IMAGE    = 'ship-strip.png'
 
+#color of the bolts
+BOLT_COLOR = 'red'
+
 # The alternate images to use in the filmstrip
 #ALIEN_IMAGES   = ('alien-strip1.png','alien-strip2.png','alien-strip3.png')
 # The number of (base) points each alien is worth.  Multiplied by row
@@ -139,7 +142,7 @@ SPEED_FACTOR = 1.03
 STEP_VOLUME = 0.3
 
 # The font choice for labels and messages
-ARCADE_FONT = 'Arcade.ttf'
+ARCADE_FONT = 'Arial.ttf'
 # A large message or label
 ARCADE_LARGE  = 60
 # A medium message or label
@@ -148,7 +151,7 @@ ARCADE_MEDIUM = 48
 ARCADE_SMALL  = 32
 
 # The background color
-DARK_GREY = introcs.RGB(32, 32, 32)
+DARK_GREY = introcs.RGB(0, 0, 255)
 # Other useful colors
 WHITE_COLOR = introcs.RGB(255, 255, 255)
 YELLOW_COLOR = introcs.RGB(255, 255, 0)
@@ -166,3 +169,24 @@ LIVES_OFFSET  = 135
 BANNER_WIDTH  = GAME_WIDTH-100
 # The height of a message banner
 BANNER_HEIGHT = GAME_HEIGHT/4
+
+#color of the bolts
+BOLT_COLOR = 'red'
+
+#the rate of speeding up the aliens
+ALIEN_ACCELERATION = 0.97
+
+#sound when the ship is destroyed
+BLAST_SOUND = 'blast1.wav'
+
+#sound when the ship fires a bolt
+SHIP_PEW = 'pew1.wav'
+
+#sound when an alien fires a bolt
+ALIEN_PEW = 'pew2.wav'
+
+#sound when an alien is killed
+POP_SOUND = 'pop1.wav'
+
+#the font of all text messages in the game
+FONT = 'Arial.ttf'
