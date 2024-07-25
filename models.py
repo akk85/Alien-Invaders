@@ -22,8 +22,8 @@ You are free to add even more models to this module.  You may wish to do this
 when you add new features to your game, such as power-ups.  If you are unsure
 about whether to make a new class or not, please ask on Piazza.
 
-# YOUR NAME(S) AND NETID(S) HERE
-# DATE COMPLETED HERE
+# Antony Kariuki, akk85
+# 12/03/2021
 """
 from consts import *
 from game2d import *
@@ -107,6 +107,23 @@ class Alien(GImage):
         super().__init__(x = X , y = Y , width = ALIEN_WIDTH ,height = ALIEN_HEIGHT ,source=source)
 
     # METHOD TO CHECK FOR COLLISION (IF DESIRED)
+    def collides(self,bolt):
+        """
+        Returns: True if the bolt was fired by the player and collides with this alien
+
+        Parameter bolt: The laser bolt to check
+        Precondition: bolt is of class Bolt
+        """
+        x1 = bolt.getX() - BOLT_WIDTH/2
+        x2 = bolt.getX() + BOLT_WIDTH/2
+        y1 = bolt.getY() - BOLT_HEIGHT/2
+        y2 = bolt.getY() + BOLT_HEIGHT/2
+
+        if (self.contains((x1, y1)) or self.contains((x1,y2)) or
+        self.contains((x2,y1)) or self.contains((x2,y2))):
+            return True
+        return False
+
 
     # ADD MORE METHODS (PROPERLY SPECIFIED) AS NECESSARY
 
